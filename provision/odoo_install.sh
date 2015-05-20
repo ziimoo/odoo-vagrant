@@ -80,11 +80,13 @@ echo -e "\n==== Installing ODOO Server ===="
 sudo git clone --branch $OE_VERSION --depth=1 https://www.github.com/odoo/odoo $OE_HOME_EXT/
 
 echo -e "\n---- Create custom module directory ----"
-sudo su $OE_USER -c "mkdir $OE_HOME/custom"
-sudo su $OE_USER -c "mkdir $OE_HOME/custom/addons"
+#sudo su $OE_USER -c "mkdir $OE_HOME/custom"
+#sudo su $OE_USER -c "mkdir $OE_HOME/custom"
+sudo su vagrant -c "mkdir /vagrant/custom"
+sudo su vagrant -c "mkdir /vagrant/custom/addons"
 
 echo -e "\n---- Setting permissions on home folder ----"
-sudo chown -R $OE_USER:$OE_USER $OE_HOME/*
+sudo chown -R vagrant:vagrant /vagrant/custom/addons/
 
 echo -e "* Create server config file"
 sudo cp $OE_HOME_EXT/debian/openerp-server.conf /etc/$OE_CONFIG.conf
@@ -95,7 +97,7 @@ echo -e "* Change server config file"
 sudo sed -i s/"db_user = .*"/"db_user = $OE_USER"/g /etc/$OE_CONFIG.conf
 sudo sed -i s/"; admin_passwd.*"/"admin_passwd = $OE_SUPERADMIN"/g /etc/$OE_CONFIG.conf
 sudo su root -c "echo 'logfile = /var/log/$OE_USER/$OE_CONFIG$1.log' >> /etc/$OE_CONFIG.conf"
-sudo su root -c "echo 'addons_path=$OE_HOME_EXT/addons,$OE_HOME/custom/addons' >> /etc/$OE_CONFIG.conf"
+sudo su root -c "echo 'addons_path=$OE_HOME_EXT/addons,/vagrant/custom/addons' >> /etc/$OE_CONFIG.conf"
 
 echo -e "* Create startup file"
 sudo su root -c "echo '#!/bin/sh' >> $OE_HOME_EXT/start.sh"
