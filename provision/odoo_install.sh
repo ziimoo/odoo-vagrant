@@ -19,8 +19,8 @@
 ##fixed parameters
 #openerp
 OE_USER="odoo"
-OE_HOME="/opt/$OE_USER"
-OE_HOME_EXT="/opt/$OE_USER/$OE_USER-server"
+OE_HOME="/vagrant/"
+OE_HOME_EXT="/vagrant/$OE_USER-server"
 
 #Enter version for checkout "8.0" for version 8.0, "7.0 (version 7), saas-4, saas-5 (opendays version) and "master" for trunk
 OE_VERSION="8.0"
@@ -191,5 +191,7 @@ sudo update-rc.d $OE_CONFIG defaults
 sudo service $OE_CONFIG start
 echo "Done! The ODOO server can be started with: service $OE_CONFIG start"
 
-
-
+echo "Installing Docker..."
+curl -sSL https://get.docker.com/ | sh
+echo "Installing mail catcher..."
+sudo docker run --name="mailcatcher" -d -p 1080:1080 -p 1025:1025 tyler43636/docker-mailcatcher
