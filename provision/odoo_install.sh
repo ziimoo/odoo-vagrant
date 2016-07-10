@@ -23,16 +23,32 @@ OE_HOME="/opt/$OE_USER"
 OE_HOME_EXT="/opt/$OE_USER/$OE_USER-server"
 
 #Enter version for checkout "8.0" for version 8.0, "7.0 (version 7), saas-4, saas-5 (opendays version) and "master" for trunk
-OE_VERSION="8.0"
+OE_VERSION="9.0"
 
 #set the superadmin password
 OE_SUPERADMIN="superadminpassword"
 OE_CONFIG="$OE_USER-server"
 
+#postgresql
+PG_VERSION="9.3"
+PG_REPO="deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main"
+PG_LIST_FILE="/etc/apt/sources.list.d/pgdg.list"
+
 #--------------------------------------------------
 # Update Server
 #--------------------------------------------------
 echo -e "\n---- Update Server ----"
+
+if grep -Fxq "$PG_REPO" $PG_LIST_FILE
+then
+    # do nothing if found already
+    echo "PG REPO already added"
+else
+    sudo echo $PG_REPO >> $PG_LIST_FILE
+fi
+
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+
 sudo apt-get update
 sudo apt-get upgrade -y
 
@@ -52,7 +68,7 @@ sudo su - postgres -c "createuser -s $OE_USER" 2> /dev/null || true
 # Install Dependencies
 #--------------------------------------------------
 echo -e "\n---- Install tool packages ----"
-sudo apt-get install wget subversion git bzr bzrtools python-pip -y
+sudo apt-get install wget subversion git bzr bzrtools python-pip node-less -y
     
 echo -e "\n---- Install python packages ----"
 sudo apt-get install python-dateutil python-feedparser python-ldap python-libxslt1 python-lxml python-mako python-openid python-psycopg2 python-pybabel python-pychart python-pydot python-pyparsing python-reportlab python-simplejson python-tz python-vatnumber python-vobject python-webdav python-werkzeug python-xlwt python-yaml python-zsi python-docutils python-psutil python-mock python-unittest2 python-jinja2 python-pypdf python-decorator python-requests python-passlib python-pil -y
@@ -60,7 +76,7 @@ sudo apt-get install python-dateutil python-feedparser python-ldap python-libxsl
 echo -e "\n---- Install python libraries ----"
 sudo pip install gdata
 
-echo -e "\n---- Install wkhtml and place on correct place for ODOO 8 ----"
+echo -e "\n---- Install wkhtml and place on correct place for ODOO ----"
 sudo wget http://downloads.sourceforge.net/project/wkhtmltopdf/archive/0.12.1/wkhtmltox-0.12.1_linux-trusty-amd64.deb
 sudo dpkg -i wkhtmltox-0.12.1_linux-trusty-amd64.deb
 sudo cp /usr/local/bin/wkhtmltopdf /usr/bin
@@ -190,6 +206,3 @@ sudo update-rc.d $OE_CONFIG defaults
  
 sudo service $OE_CONFIG start
 echo "Done! The ODOO server can be started with: service $OE_CONFIG start"
-
-
-
